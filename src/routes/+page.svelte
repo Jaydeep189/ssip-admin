@@ -5,7 +5,7 @@
 	import Proccessing from '../components/dashboard/Proccessing.svelte';
 </script>
 
-<div class="mx-auto w-full p-20">
+<div class="mx-auto w-full pt-20">
 	<div class="grid grid-cols-2 gap-5">
 		<NewComplaints />
 		<Done />

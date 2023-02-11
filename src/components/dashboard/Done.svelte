@@ -16,7 +16,7 @@
 							collection(db, 'Complaint-Registration'),
 							where('deptId', '==', dept.deptId),
 							where('wardId', '==', dept.wardId),
-							where('date', '>=', new Date().setHours(0, 0, 0, 0)),
+							// where('date', '>=', new Date().setHours(0, 0, 0, 0)),
 							where('status', '==', 'SOLVED'),
 							limit(5)
 						)}
@@ -42,7 +42,7 @@
 								{/each}
 								<a
 									class="transition-transform w-4/12 mx-auto mt-2 hover:scale-105 text-center duration-500 rounded-lg hover:bg-indigo-700 bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow"
-									href="/"
+									href="/completed"
 								>
 									View More
 								</a>

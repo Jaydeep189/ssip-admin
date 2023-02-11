@@ -50,6 +50,17 @@
 				})
 		},
 		{
+			accessorKey: 'tenantNo',
+			header: () => 'TENANT NO',
+			footer: (info) => info.column.id,
+			cell: (info) =>
+				renderComponent(LinkComponent, {
+					link: info.cell.row.getValue('id'),
+					data: info.getValue(),
+					isDownload: false
+				})
+		},
+		{
 			accessorKey: 'file',
 			header: () => 'DOCUMENT',
 			cell: (info) =>
@@ -102,15 +113,54 @@
 		querySnapshot.forEach(async (document) => {
 			await updateDoc(doc(db, 'Complaint-Registration', document.id), {
 				status: selectStatus.value
+			}).then(() => {
+				window.location.reload();
 			});
 		});
 	};
+	const handleMerge = async () => {
+		const q = query(collection(db, 'Complaint-Registration'), where('groupId', '==', mergeGroupId));
+		const querySnapshot = await getDocs(q);
+		querySnapshot.docs.forEach(async (document) => {
+			const q = query(collection(db, 'Complaint-Registration'), where('groupId', '==', groupId));
+			const querySnapshot = await getDocs(q);
+			if (document.data().isGroup) {
+				querySnapshot.docs.forEach(async (document) => {
+					if (document.data().isGroup) {
+						alert("Can't merge be Merged");
+					} else {
+						await updateDoc(doc(db, 'Complaint-Registration', document.id), {
+							groupId: mergeGroupId,
+							isGroup: true
+						}).then(() => {
+							window.location.reload();
+						});
+					}
+				});
+			} else {
+				const q = query(collection(db, 'Complaint-Registration'), where('groupId', '==', groupId));
+				const querySnapshot = await getDocs(q);
+				querySnapshot.docs.forEach(async (document) => {
+					await updateDoc(doc(db, 'Complaint-Registration', document.id), {
+						isGroup: true
+					});
+				});
+				await updateDoc(doc(db, 'Complaint-Registration', document.id), {
+					groupId: groupId,
+					isGroup: true
+				}).then(() => {
+					window.location.reload();
+				});
+			}
+		});
+	};
 	export let groupId = '';
+	export let mergeGroupId = '';
 </script>
 
-<div class="relative flex flex-col">
+<div class="relative flex flex-col border-b-2 border-gray-400 pb-10">
 	<div class="overflow-x-auto shadow-md max-sm:py-10">
-		<div class="inline-block  min-w-full align-middle ">
+		<div class="inline-block  min-w-full align-middle">
 			<div class="divide-y divide-gray-200 rounded-lg border bg-white p-2 shadow-md ">
 				<div class="overflow-hidden">
 					<table class="min-w-full divide-y divide-gray-200 bg-white ">
@@ -216,12 +266,31 @@
 			</div>
 		</div>
 	</div>
-	<div class="flex justify-center items-center gap-5">
-		<h1>Update All Status</h1>
-		<Select
-			items={['PENDING', 'PROCESSING', 'SOLVED', 'REJECTED', 'FAILED']}
-			bind:value={selectStatus}
-			on:change={(e) => UpdateStatusAll()}
-		/>
+	<div class="flex justify-center items-center gap-2 mt-5">
+		<div>
+			<h1>Update All Group Status</h1>
+		</div>
+		<div class="basis-1/2">
+			<Select
+				items={['PENDING', 'PROCESSING', 'SOLVED', 'REJECTED', 'FAILED']}
+				bind:value={selectStatus}
+				on:change={(e) => UpdateStatusAll()}
+			/>
+		</div>
+	</div>
+	<div class="flex justify-center items-center gap-5 mt-5">
+		<div>
+			<h1>Enter GroupId to Merge</h1>
+		</div>
+		<div class="basis-1/2">
+			<input type="text" bind:value={mergeGroupId} class=" form-input rounded-lg" />
+			<button
+				id="sign-in-button"
+				on:click={() => handleMerge()}
+				class="inline-block shrink-0 rounded-md border border-orange-600 bg-orange-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-orange-600 focus:outline-none focus:ring active:text-orange-500"
+			>
+				MERGER
+			</button>
+		</div>
 	</div>
 </div>

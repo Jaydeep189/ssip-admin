@@ -18,7 +18,7 @@
 						collection(db, 'Complaint-Registration'),
 						where('deptId', '==', d.deptId),
 						where('wardId', '==', d.wardId),
-						where('status', '!=', 'DONE'),
+						where('status', '!=', 'SOLVED'),
 						where('isGroup', '==', true)
 					)}
 				>
@@ -31,7 +31,7 @@
 								where('isGroup', '==', true)
 							)}
 						>
-							<div class="bg-gray-50 rounded-xl p-5 text-xl font-bold">
+							<div class=" rounded-xl p-5 text-xl font-bold">
 								<Collection
 									let:data={name}
 									ref={query(
@@ -42,7 +42,53 @@
 									)}
 								>
 									{#each name as n}
-										<h1>Group : {n.problemName}</h1>
+										<div class="flex justify-between">
+											<h1 class="py-2">Group : {n.problemName}</h1>
+											<h1 class="py-2 text-sm">Group Id : {c}</h1>
+										</div>
+									{/each}
+								</Collection>
+								<div class="p-2">
+									<GroupComplaints data={groupData} groupId={c} />
+								</div>
+							</div>
+						</Collection>
+					{/each}
+				</Collection>
+				<Collection
+					let:data={com}
+					ref={query(
+						collection(db, 'Complaint-Registration'),
+						where('deptId', '==', d.deptId),
+						where('wardId', '==', d.wardId),
+						where('status', '!=', 'SOLVED'),
+						where('isGroup', '==', false)
+					)}
+				>
+					{#each [...new Set(com.map((item) => item.groupId))] as c}
+						<Collection
+							let:data={groupData}
+							ref={query(
+								collection(db, 'Complaint-Registration'),
+								where('groupId', '==', c),
+								where('isGroup', '==', false)
+							)}
+						>
+							<div class=" rounded-xl p-5 text-xl font-bold">
+								<Collection
+									let:data={name}
+									ref={query(
+										collection(db, 'Complaint-Registration'),
+										where('groupId', '==', c),
+										where('isGroup', '==', false),
+										limit(1)
+									)}
+								>
+									{#each name as n}
+										<div class="flex justify-between">
+											<h1 class="py-2">Group : {n.problemName}</h1>
+											<h1 class="py-2 text-sm">Group Id : {c}</h1>
+										</div>
 									{/each}
 								</Collection>
 								<div class="p-2">

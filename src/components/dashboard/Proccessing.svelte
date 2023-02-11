@@ -16,7 +16,7 @@
 							collection(db, 'Complaint-Registration'),
 							where('deptId', '==', dept.deptId),
 							where('wardId', '==', dept.wardId),
-							where('date', '>=', new Date().setHours(0, 0, 0, 0)),
+							// where('date', '>=', new Date().setHours(0, 0, 0, 0)),
 							where('status', '==', 'PROCESSING'),
 							limit(5)
 						)}
@@ -32,7 +32,7 @@
 								>
 							</div>
 						</div>
-						<div class="flex flex-col gap-2 w-10/12 mx-auto my-5">
+						<div class="flex flex-col gap-2 space-y-5 w-10/12 mx-auto my-5">
 							<div class="flex items-center gap-3 bg-indigo-500 rounded-lg p-2">
 								{#if newComplaints.length !== 0}
 									<div class="flex flex-col justify-between gap-2 w-11/12 mx-auto my-5">
@@ -50,7 +50,7 @@
 													</div>
 												</div>
 												<div class=" gap-5 p-1 mt-3">
-													<Collection
+													<!-- <Collection
 														let:data
 														ref={query(collection(db, 'User'), where('uid', '==', c.userId))}
 													>
@@ -59,7 +59,7 @@
 																<h4 class="text-white font-medium text-right">User: {d.name}</h4>
 															</div>
 														{/each}
-													</Collection>
+													</Collection> -->
 												</div>
 											</div>
 										{/each}
@@ -73,7 +73,7 @@
 
 							<a
 								class="transition-transform w-4/12 mb-5 mx-auto mt-2 hover:scale-105 text-center duration-500 rounded-lg hover:bg-indigo-700 bg-gray-900 px-5 py-2.5 text-sm font-bold text-white shadow"
-								href="/"
+								href="/group-complaints"
 							>
 								View More
 							</a>
