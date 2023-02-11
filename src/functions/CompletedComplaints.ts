@@ -8,7 +8,7 @@ type Complaints = {
 	date: string;
 };
 
-export default async function getNewComplaints(uid: string) {
+export default async function getCompletedComplaints(uid: string) {
 	let deptId = '';
 	let wardId = '';
 	const ls: Complaints[] = [];
@@ -23,7 +23,7 @@ export default async function getNewComplaints(uid: string) {
 		collection(db, 'Complaint-Registration'),
 		where('deptId', '==', deptId),
 		where('wardId', '==', wardId),
-		where('status', '==', 'PENDING')
+		where('status', '==', 'SOLVED')
 	);
 	const complaints = await getDocs(q);
 	complaints.forEach((doc: any) => {

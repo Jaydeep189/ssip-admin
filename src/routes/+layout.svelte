@@ -5,5 +5,7 @@
 
 <main class="flex bg-indigo-50">
 	<Sidebar />
-	<slot />
+	<div class="mx-auto w-full ">
+		<slot />
+	</div>
 </main>

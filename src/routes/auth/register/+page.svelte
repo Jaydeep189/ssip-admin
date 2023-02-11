@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
+	import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 	import type { ApplicationVerifier } from 'firebase/auth';
 	import Loading from '../../../components/Loading.svelte';
 	import AMCLogo from '../../../assets/amc_logo.jpg';
@@ -9,9 +9,10 @@
 	import { onMount, prevent_default } from 'svelte/internal';
 	import Register from '../../../functions/Register';
 	import Select from 'svelte-select';
-	import { collection, getDocs, query, where } from 'firebase/firestore';
 	auth.useDeviceLanguage();
 	let appVerifier: ApplicationVerifier;
+	const wardCollection = collectionStore(db, 'Ward');
+	const departmentCollection = collectionStore(db, 'Department');
 	onMount(() => {
 		window.recaptchaVerifier = new RecaptchaVerifier(
 			'sign-in-button',
@@ -27,23 +28,20 @@
 		);
 		appVerifier = window.recaptchaVerifier;
 	});
-	let phoneError = '';
-	const sendOTP = async () => {
-		const q = query(collection(db, 'User'));
-		const querySnapshot = await getDocs(q);
-		querySnapshot.forEach((doc) => {
-			console.log(doc.data());
-		});
-
+	const sendOTP = () => {
 		console.log(phoneNumber);
 		isLoading = true;
-		signInWithPhoneNumber(auth, '+91' + phoneNumber, appVerifier).then((confirmationResult) => {
-			window.confirmationResult = confirmationResult;
-			console.log(window.confirmationResult);
-			isCode = true;
-			isLoading = false;
-			// ...
-		});
+		signInWithPhoneNumber(auth, '+91' + phoneNumber, appVerifier)
+			.then((confirmationResult) => {
+				window.confirmationResult = confirmationResult;
+				console.log(window.confirmationResult);
+				isCode = true;
+				isLoading = false;
+				// ...
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	};
 	const handleSignIn = async () => {
 		isLoading = true;
@@ -98,8 +96,81 @@
 				<h1 class="font-black text-6xl">AMC</h1>
 			</div>
 			<h1 class="text-2xl text-center font-medium text-indigo-500 col-span-12">
-				Login to Admin Account
+				Create Admin Account
 			</h1>
+			<div class="col-span-6 pt-2 pb-2 ">
+				<label for="name" class="block text-sm font-medium text-gray-700"> Full Name </label>
+				<input
+					type="text"
+					name="name"
+					bind:value={name}
+					class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+				/>
+			</div>
+
+			<div class="col-span-6 pt-2 pb-2">
+				<label for="department" class="block text-sm font-medium text-gray-700"> Department </label>
+				<Select
+					items={$departmentCollection.map((data) => {
+						return {
+							value: data.id,
+							label: data.name
+						};
+					})}
+					bind:value={department}
+					name="department"
+				/>
+			</div>
+
+			<div class="col-span-6 pt-2 pb-2">
+				<label for="ward" class="block text-sm font-medium text-gray-700"> Ward </label>
+				<Select
+					items={$wardCollection.map((data) => {
+						return {
+							value: data.id,
+							label: data.name
+						};
+					})}
+					bind:value={ward}
+					name="ward"
+				/>
+			</div>
+			<div class="col-span-6 pt-2 pb-2">
+				<label for="age" class="block text-sm font-medium text-gray-700"> Age </label>
+				<input
+					type="number"
+					name="age"
+					bind:value={age}
+					class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+				/>
+			</div>
+			<div class="col-span-6 pt-2 pb-2">
+				<label for="aadhar" class="block text-sm font-medium text-gray-700"> Addhar Number </label>
+				<input
+					type="number"
+					name="aadhar"
+					bind:value={aadhar}
+					class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+				/>
+			</div>
+			<div class="col-span-6 pt-2 pb-2">
+				<label for="email" class="block text-sm font-medium text-gray-700"> Email </label>
+				<input
+					type="email"
+					name="email"
+					bind:value={email}
+					class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+				/>
+			</div>
+			<div class="col-span-12 pt-2 pb-2">
+				<label for="address" class="block text-sm font-medium text-gray-700"> Address </label>
+				<textarea
+					name="address"
+					bind:value={address}
+					class="mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm"
+				/>
+			</div>
+
 			{#if isCode}
 				<div class="col-span-12">
 					<label for="code" class="block text-sm font-medium text-gray-700"> Enter Code </label>
@@ -138,13 +209,10 @@
 						{isCode ? 'CONFIRM OTP' : 'GET OTP'}
 					{/if}
 				</button>
-				<p class="flex justify-center text-lg text-red-500">
-					{phoneError}
-				</p>
 
 				<p class="mt-4 text-sm text-gray-500 sm:mt-0">
-					create account?
-					<a href="/auth/register" class="text-gray-700 underline">Register</a>.
+					Already have an account?
+					<a href="/#" class="text-gray-700 underline">Log in</a>.
 				</p>
 			</div>
 		</form>

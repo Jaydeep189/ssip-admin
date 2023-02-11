@@ -8,10 +8,6 @@
 <div class="bg-white rounded-lg">
 	<FirebaseApp {auth} firestore={db}>
 		<User let:user>
-			<div class="flex gap-2 items-center p-3 px-5">
-				<AlertCircle class="h-8" color="#6366f1" />
-				<h2 class="font-bold text-xl">New Complaints</h2>
-			</div>
 			<Collection let:data ref={query(collection(db, 'Admin'), where('uid', '==', user?.uid))}>
 				{#each data as dept}
 					<Collection
@@ -20,10 +16,22 @@
 							collection(db, 'Complaint-Registration'),
 							where('deptId', '==', dept.deptId),
 							where('wardId', '==', dept.wardId),
+							where('date', '>=', new Date().setHours(0, 0, 0, 0)),
 							where('status', '==', 'PENDING'),
 							limit(5)
 						)}
 					>
+						<div class="flex justify-between gap-2 items-center p-3 px-5">
+							<div class="flex items-center gap-2">
+								<AlertCircle class="h-8" color="#6366f1" />
+								<h2 class="font-bold text-xl">New Complaints</h2>
+							</div>
+							<div class="font-bold">
+								Complaint Filed Today : <span class="font-bold text-indigo-600"
+									>{newComplaints.length}</span
+								>
+							</div>
+						</div>
 						{#if newComplaints.length !== 0}
 							<div class="flex flex-col justify-between gap-2 w-10/12 mx-auto my-5">
 								{#each newComplaints as c}
